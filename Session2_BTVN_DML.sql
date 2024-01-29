@@ -1,5 +1,5 @@
 -- 1. Báo cáo tổng doanh thu từng đơn hàng
-SELECT o.*, sum(od.Price*od.Quantity) as total_benefit
+SELECT o.*, CONCAT('$ ',sum(od.Price*od.Quantity)) as total_benefit
 	FROM orders o
     INNER JOIN orderdetails od ON od.OrderID = o.OrderID
     GROUP BY o.OrderID
@@ -22,14 +22,14 @@ SELECT cus.*, count(o.CustomerID) as total_orders
 ;
 
 -- 4. Báo cáo tỷ lệ đơn hàng đã giao thành công
-SELECT o.Status, (count(o.Status)/sum(o.OrderID))*100 as total_completed_rate
+SELECT o.Status, CONCAT((count(o.Status)/sum(o.OrderID))*100, ' %') as total_completed_rate
 	FROM orders o
     WHERE o.Status = 'Delivered'
     GROUP BY o.Status
 ;
 
 -- 5. Báo cáo đánh giá sản phẩm và điểm đánh giá trung bình cho mỗi sản phẩm
-SELECT p.ProductID,p.ProductName, avg(rw.Rating) as AVG_rating,
+SELECT p.ProductID,p.ProductName, ROUND(avg(rw.Rating),1) as AVG_rating,
 		(SELECT count(rw.Rating) FROM reviews rw WHERE rw.Rating = 5 and rw.ProductID = p.ProductID ) as rating_5,
 		(SELECT count(rw.Rating) FROM reviews rw WHERE rw.Rating = 4 and rw.ProductID = p.ProductID ) as rating_4,
 		(SELECT count(rw.Rating) FROM reviews rw WHERE rw.Rating = 3 and rw.ProductID = p.ProductID ) as rating_3,
@@ -64,7 +64,7 @@ SELECT p.ProductID, p.ProductName, rw.Rating
 ;
 
 -- 8. Tìm khách hàng có đơn hàng có giá trị cao nhất
-SELECT cus.*, tbl_benefit.total_benefit
+SELECT cus.*, CONCAT('$ ',tbl_benefit.total_benefit) as total_value
 	FROM customers cus
 	INNER JOIN (SELECT o.*, sum(od.Price*od.Quantity) as total_benefit
 					FROM orders o
@@ -77,7 +77,7 @@ WHERE tbl_benefit.total_benefit = (SELECT max(total_benefit) FROM (SELECT o.*, s
 ;
 
 -- 9. Tổng doanh thu từng tháng trong năm
-SELECT month(o.OrderDate) as Tháng, sum(tbl_benefit.total_benefit) as Tổng_doanh_thu
+SELECT CONCAT('Tháng ',month(o.OrderDate)) as Tháng, CONCAT('$ ',sum(tbl_benefit.total_benefit)) as Tổng_doanh_thu
 	FROM orders o
     INNER JOIN (SELECT o.*, sum(od.Price*od.Quantity) as total_benefit
 				FROM orders o
