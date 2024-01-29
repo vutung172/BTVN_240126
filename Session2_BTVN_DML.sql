@@ -41,7 +41,7 @@ SELECT p.ProductID,p.ProductName, avg(rw.Rating) as AVG_rating,
 ;
 
 -- 6. Liệt kê các sản phẩm được đặt hàng nhiều nhất
-SELECT p.*
+SELECT p.*, sum(od.quantity) as total_orders
 		FROM products p 
 		INNER JOIN orderdetails od ON od.ProductID = p.ProductID
         GROUP BY p.ProductID
@@ -56,11 +56,11 @@ SELECT p.*
 SELECT p.ProductID, p.ProductName, rw.Rating
 	FROM products p
     INNER JOIN reviews rw ON rw.ProductID = p.ProductID
-    INNER JOIN (SELECT p.ProductID,p.ProductName, avg(rw.Rating) as AVG_rating
+    INNER JOIN (SELECT p.ProductID,p.ProductName, avg(rw.Rating) as Avg_rating
 							FROM products p
 							LEFT JOIN reviews rw ON rw.ProductID = p.ProductID
 							GROUP BY p.ProductID) as avg_rate ON avg_rate.ProductID = p.ProductID
-    WHERE rw.Rating > avg_rate.AVG_rating
+    WHERE rw.Rating > avg_rate.Avg_rating
 ;
 
 -- 8. Tìm khách hàng có đơn hàng có giá trị cao nhất
@@ -84,4 +84,5 @@ SELECT month(o.OrderDate) as Tháng, sum(tbl_benefit.total_benefit) as Tổng_do
 				INNER JOIN orderdetails od ON od.OrderID = o.OrderID
 				GROUP BY o.OrderID) as tbl_benefit ON tbl_benefit.OrderId = o.OrderId
 	GROUP BY Tháng
+	ORDER BY Tháng ASC
 ;
