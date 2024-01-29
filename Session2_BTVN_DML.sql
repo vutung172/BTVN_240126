@@ -45,8 +45,7 @@ SELECT p.*, sum(od.quantity) as total_orders
 		FROM products p 
 		INNER JOIN orderdetails od ON od.ProductID = p.ProductID
         GROUP BY p.ProductID
-        HAVING sum(od.Quantity) = (SELECT max(total_ordered) FROM
-																(SELECT p.*,sum(od.Quantity) as total_ordered
+        HAVING sum(od.Quantity) = (SELECT max(total_ordered) FROM (SELECT p.*,sum(od.Quantity) as total_ordered
 																		FROM products p 
 																		INNER JOIN orderdetails od ON od.ProductID = p.ProductID
 																		GROUP BY p.ProductID) as p)
@@ -70,7 +69,7 @@ SELECT cus.*, CONCAT('$ ',tbl_benefit.total_benefit) as total_value
 					FROM orders o
 					INNER JOIN orderdetails od ON od.OrderID = o.OrderID
 					GROUP BY o.OrderID) as tbl_benefit ON cus.CustomerID = tbl_benefit.CustomerID
-WHERE tbl_benefit.total_benefit = (SELECT max(total_benefit) FROM (SELECT o.*, sum(od.Price*od.Quantity) as total_benefit
+WHERE tbl_benefit.total_benefit = (SELECT max(total_benefit) FROM (SELECT o.*, sum(od.Price*od.Quantity) as total_benefit 
 																		FROM orders o
 																		INNER JOIN orderdetails od ON od.OrderID = o.OrderID
 																		GROUP BY o.OrderID) as tbl_benefit)
